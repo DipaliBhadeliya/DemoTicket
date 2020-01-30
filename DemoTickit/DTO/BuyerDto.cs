@@ -12,6 +12,7 @@ namespace DemoTicket.DTO
         public int BuyerId { get; set; }
         public int EventId { get; set; }
         public string TesterKey { get; set; }
+
         public string BuyerName { get; set; }
 
         public EventDto Event { get; set; }
