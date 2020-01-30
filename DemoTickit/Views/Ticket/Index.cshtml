@@ -1,0 +1,116 @@
+﻿@model DemoTicket.DTO.BuyerDto;
+@{
+    ViewData["Title"] = "Tickit Page";
+}
+
+<h3>Book ticket</h3>
+<div id="clockdiv">
+    <div>
+        <label>You have left: </label>
+        <span class="days" id="day"></span>
+        <label class="smalltext">Days</label>
+
+        <span class="hours" id="hour"></span>
+        <label class="smalltext">Hours</label>
+
+        <span class="minutes" id="minute"></span>
+        <label class="smalltext">Minutes</label>
+
+        <span class="seconds" id="second"></span>
+        <label class="smalltext">Seconds</label>
+    </div>
+</div>
+<div id="Message"></div>
+
+<div class="form-group">
+    @Html.LabelFor(model => model.BuyerName, new { @class = "from-control" })
+    @Html.TextBoxFor(model => model.BuyerName, new { @class = "from-control",@required=""})
+    @Html.HiddenFor(model => model.Event.EventId)
+    @Html.HiddenFor(model => model.Event.TimeoutInSeconds)
+    <br />
+    <input type="submit" id="btnSubmit" class="btn btn-primary" value="submit" />
+</div>
+<script>
+    var x;
+    var eventId;
+    var windowTimeout;
+    $(document).ready(function () {
+        eventId = $('#Event_EventId').val();
+//        checkTickitAvailable(eventId);
+//        windowTimeout = window.setInterval(function () {
+//            checkTickitAvailable(eventId);
+//},3000);
+        var time =  parseInt($('#Event_TimeoutInSeconds').val()) * 1000;
+        var dateObj = Date.now();
+        var deadline = dateObj + time;
+        x = setInterval(function () {
+                var now = new Date().getTime();
+                var t = deadline - now;
+                if (t < 0) {
+                    clearInterval(x);
+                    $('#clockdiv').hide();
+                    $('#btnSubmit').hide();
+                    document.getElementById("Message").innerHTML = "Time Expire";
+                }
+                else {
+
+                var days = Math.floor(t / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((t % (1000 * 60)) / 1000);
+                document.getElementById("day").innerHTML = days;
+                document.getElementById("hour").innerHTML = hours;
+                document.getElementById("minute").innerHTML = minutes;
+                document.getElementById("second").innerHTML = seconds;
+            }
+
+        }, 1000);
+    });
+    function checkTickitAvailable(eventId) {
+        $.ajax({
+            type: 'post',
+            url: '@Url.ActionLink("CheckTickitAvailability","Ticket")',
+            dataType: 'json',
+            data: { eventId: eventId},
+            success: function (result) {
+                if (result) {
+                    $('#btnSubmit').hide();
+                     clearInterval(x);
+
+                    $('#btnSubmit').hide();
+                    $('#clockdiv').hide();
+                    document.getElementById("Message").innerHTML = "Too Late.";
+                }
+            }
+        })
+    }
+
+    $('#btnSubmit').click(function () {
+        if ($('#BuyerName').val()=="") {
+           alert("Please enter buyer name")
+            return false;
+        }
+        $.ajax({
+            type: 'post',
+            url: '@Url.ActionLink("SaveBuyTckit","Ticket")',
+            dataType: 'json',
+            data: { buyerName: $('#BuyerName').val(), eventId: $('#Event_EventId').val() },
+            success: function (result) {
+                if (result.success) {
+                    clearInterval(windowTimeout);
+                    clearInterval(x);
+                    $('#clockdiv').hide();
+                    $('#btnSubmit').hide();
+                    document.getElementById("Message").innerHTML = "Congratulation you bought tickit successfully.";
+                }
+                else {
+                     clearInterval(windowTimeout);
+                    clearInterval(x);
+                    $('#clockdiv').hide();
+                    $('#btnSubmit').hide();
+                    document.getElementById("Message").innerHTML = result.data;
+                }
+            }
+        })
+    })
+</script>
