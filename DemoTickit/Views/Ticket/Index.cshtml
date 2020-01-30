@@ -21,7 +21,7 @@
     </div>
 </div>
 <div id="Message"></div>
-
+<div id="divSuccess"></div>
 <div class="form-group">
     @Html.LabelFor(model => model.BuyerName, new { @class = "from-control" })
     @Html.TextBoxFor(model => model.BuyerName, new { @class = "from-control",@required=""})
@@ -87,7 +87,8 @@
 
     $('#btnSubmit').click(function () {
         if ($('#BuyerName').val()=="") {
-           alert("Please enter buyer name")
+            alert("Please enter buyer name")
+            $('#BuyerName').focus();
             return false;
         }
         $.ajax({
@@ -99,9 +100,10 @@
                 if (result.success) {
                     clearInterval(windowTimeout);
                     clearInterval(x);
+                    $('#Message').hide();
                     $('#clockdiv').hide();
                     $('#btnSubmit').hide();
-                    document.getElementById("Message").innerHTML = "Congratulation you bought tickit successfully.";
+                    document.getElementById("divSuccess").innerHTML = "Congratulation you bought ticket successfully.";
                 }
                 else {
                      clearInterval(windowTimeout);
