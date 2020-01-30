@@ -36,10 +36,10 @@
     var windowTimeout;
     $(document).ready(function () {
         eventId = $('#Event_EventId').val();
-//        checkTickitAvailable(eventId);
-//        windowTimeout = window.setInterval(function () {
-//            checkTickitAvailable(eventId);
-//},3000);
+        checkTickitAvailable(eventId);
+        windowTimeout = window.setInterval(function () {
+            checkTickitAvailable(eventId);
+},3000);
         var time =  parseInt($('#Event_TimeoutInSeconds').val()) * 1000;
         var dateObj = Date.now();
         var deadline = dateObj + time;
